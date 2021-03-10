@@ -1,16 +1,29 @@
 package si.hrovat.gcloud.functions.http
 
-import com.google.cloud.functions.HttpFunction
-import com.google.cloud.functions.HttpRequest
-import com.google.cloud.functions.HttpResponse
 import javax.enterprise.context.ApplicationScoped
+import javax.inject.Inject
 import javax.inject.Named
+import javax.ws.rs.GET
+import javax.ws.rs.Path
+import javax.ws.rs.PathParam
+import javax.ws.rs.Produces
+import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.Response
 
-@Named("testHttpFunction")
 @ApplicationScoped
-class HttpFunctionTest : HttpFunction {
+@Path("/hello")
+class DemoResource @Inject constructor(val testService: TestInjectionService) {
 
-    override fun service(request: HttpRequest?, response: HttpResponse?) {
-        response?.writer?.write("Hello from gCloud!")
-    }
+    @Path("/{name}")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    fun helloName(@PathParam("name") name: String): Response =
+        Response.ok(testService.testInjectMethodWithParam(name)).build()
+}
+
+@ApplicationScoped
+class TestInjectionService {
+
+    fun testInjectMethod(): String = "Hello from gCloud!"
+    fun testInjectMethodWithParam(name: String): String = "Hello $name from gCloud!"
 }
