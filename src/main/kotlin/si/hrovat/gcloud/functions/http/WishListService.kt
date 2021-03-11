@@ -1,7 +1,6 @@
 package si.hrovat.gcloud.functions.http
 
 import org.eclipse.microprofile.config.inject.ConfigProperty
-import javax.annotation.PostConstruct
 import javax.enterprise.context.ApplicationScoped
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.firestore.Firestore
@@ -62,7 +61,18 @@ class WishListService {
     }
 
     fun addItem(id: String, item: WishListItem): WishList {
-        TODO("Not yet implemented")
+        val document = db.collection(collection).document(id).get()
+        val list = document.get().toObject(WishList::class.java)!!
+
+        list.items = if (list.items != null) listOf(item, *(list.items!!.toTypedArray())) else listOf(item)
+        db.collection(collection).document(id).set(list).get()
+        val docSnapshot = document.get()
+        val wishList = docSnapshot.toObject(WishList::class.java)!!
+
+        wishList.id = docSnapshot.id
+        log.info("Wish list updated {}", wishList)
+
+        return wishList
     }
 
 }

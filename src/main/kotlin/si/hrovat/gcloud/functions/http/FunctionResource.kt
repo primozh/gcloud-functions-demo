@@ -38,7 +38,7 @@ class WishListResource @Inject constructor(val wishListService: WishListService,
     fun createWishList(item: WishList): Response {
         logger.info("Received wish list {}", item)
         val wishList = wishListService.createList(item)
-        return Response.created(uriInfo.requestUriBuilder.path(wishList?.id).build()).build()
+        return Response.created(uriInfo.requestUriBuilder.path(wishList?.id).build()).entity(wishList).build()
     }
 
     @POST
@@ -63,7 +63,9 @@ class WishListResource @Inject constructor(val wishListService: WishListService,
 data class WishListItem(
     @JsonProperty("item_id") var itemId: String,
     @JsonProperty("item_name") var itemName: String
-)
+) {
+    constructor() : this("", "")
+}
 
 data class WishList(
     @JsonProperty("id") var id: String?,
